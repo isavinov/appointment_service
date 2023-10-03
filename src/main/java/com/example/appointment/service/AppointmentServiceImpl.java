@@ -2,6 +2,7 @@ package com.example.appointment.service;
 
 import com.example.appointment.domain.AppointmentSlot;
 import com.example.appointment.domain.Physician;
+import com.example.appointment.dto.AppointmentDTO;
 import com.example.appointment.exception.CouldNotCreateAppointmentException;
 import com.example.appointment.exception.PhysicianNotFoundException;
 import com.example.appointment.repository.AppointmentRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -53,6 +55,15 @@ public class AppointmentServiceImpl implements AppointmentService {
             result.add(createAppointment(physician, appointment));
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public Collection<AppointmentDTO> findAvailableAppointments(UUID physicianUuid, LocalDate date) {
+        return appointmentRepository.getAvailableAppointments(physicianUuid, date)
+                .stream()
+                .map(AppointmentDTO::fromEntity)
+                .toList();
     }
 
     private LocalDateTime toLocalDateTime(XMLGregorianCalendar xgc) {

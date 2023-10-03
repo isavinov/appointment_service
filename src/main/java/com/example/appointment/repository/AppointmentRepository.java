@@ -30,6 +30,6 @@ public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Lo
      * @param date        Date and Time
      * @return Collection of appointments
      */
-    @Query("select a from AppointmentSlot a join a.physician p where p.uuid = :physicianId and a.startDateTime < :date and a.endDateTime >= :date")
+    @Query("select a from AppointmentSlot a join a.physician p where p.uuid = :physicianId and a.startDateTime < :date and a.endDateTime > :date")
     Collection<AppointmentSlot> findAllScheduledAppointments(UUID physicianId, LocalDateTime date);
 }
