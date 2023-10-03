@@ -10,8 +10,9 @@ import java.util.UUID;
 @Entity
 @Table(name="appointment_slot")
 public class AppointmentSlot {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "uuid", nullable = false, unique = true)

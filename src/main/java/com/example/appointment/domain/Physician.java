@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Physician {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "uuid", nullable = false, unique = true)

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: /liquibase/patches/initial_schema.sql
+  - include:
+      file: /liquibase/patches/seed.sql
+
+
