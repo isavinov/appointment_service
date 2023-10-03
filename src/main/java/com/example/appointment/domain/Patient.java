@@ -12,6 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "patient")
 public class Patient {
+
     @Id
     @GeneratedValue
     private Long id;
@@ -32,5 +33,5 @@ public class Patient {
     private LocalDate dateOfBirth;
 
     @OneToMany(mappedBy = "patient")
-    private Set<Appointment> appointments;
+    private Set<AppointmentSlot> appointments;
 }

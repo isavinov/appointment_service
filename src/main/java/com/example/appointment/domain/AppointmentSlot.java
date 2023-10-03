@@ -8,8 +8,8 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="appointment")
-public class Appointment {
+@Table(name="appointment_slot")
+public class AppointmentSlot {
     @Id
     @GeneratedValue
     private Long id;

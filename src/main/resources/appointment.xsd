@@ -1,15 +1,16 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.com/appointment/web-service"
            targetNamespace="http://example.com/appointment/web-service" elementFormDefault="qualified">
 
-    <xs:element name="createAppointmentRequest">
+    <xs:element name="scheduleAppointmentRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element maxOccurs="unbounded" name="appointment" type="tns:appointment"/>
+                <xs:element name="physicianUuid" type="xs:string"/>
+                <xs:element maxOccurs="unbounded" name="appointment" type="tns:appointmentDetails"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="createAppointmentResponse">
+    <xs:element name="scheduleAppointmentResponse">
         <xs:complexType>
             <xs:sequence>
                 <xs:element maxOccurs="unbounded" name="appointmentId" type="xs:string"/>
@@ -18,12 +19,10 @@
     </xs:element>
 
 
-
-    <xs:complexType name="appointment">
+    <xs:complexType name="appointmentDetails">
         <xs:sequence>
-            <xs:element name="doctorId" type="xs:string"/>
             <xs:element name="startDateTime" type="xs:dateTime"/>
-            <xs:element name="duration" type="xs:int"/>
+            <xs:element name="duration" type="xs:duration"/>
         </xs:sequence>
     </xs:complexType>
 

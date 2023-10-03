@@ -28,5 +28,5 @@ public class Physician {
     private String middleName;
 
     @OneToMany(mappedBy = "physician")
-    private Set<Appointment> appointments;
+    private Set<AppointmentSlot> appointments;
 }

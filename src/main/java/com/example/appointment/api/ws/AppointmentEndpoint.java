@@ -1,8 +1,8 @@
 package com.example.appointment.api.ws;
 
 import com.example.appointment.service.AppointmentService;
-import com.example.appointment.web_service.CreateAppointmentRequest;
-import com.example.appointment.web_service.CreateAppointmentResponse;
+import com.example.appointment.web_service.ScheduleAppointmentRequest;
+import com.example.appointment.web_service.ScheduleAppointmentResponse;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -21,12 +21,13 @@ public class AppointmentEndpoint {
         this.appointmentService = appointmentService;
     }
 
-
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createAppointmentRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "scheduleAppointmentRequest")
     @ResponsePayload
-    public CreateAppointmentResponse getCountry(@RequestPayload CreateAppointmentRequest request) {
-        CreateAppointmentResponse response = new CreateAppointmentResponse();
-        response.getAppointmentId().addAll(appointmentService.createAppointments(request).stream().map(UUID::toString).toList());
+    public ScheduleAppointmentResponse getCountry(@RequestPayload ScheduleAppointmentRequest request) {
+        ScheduleAppointmentResponse response = new ScheduleAppointmentResponse();
+        response.getAppointmentId()
+                .addAll(appointmentService.createAppointmentSlots(UUID.fromString(request.getPhysicianUuid()),
+                        request.getAppointment()).stream().map(UUID::toString).toList());
         return response;
     }
 }
