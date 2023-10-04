@@ -8,10 +8,19 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Long> {
+
+    /**
+     * Find an appointment by UUID
+     *
+     * @param uuid Appointment UUID
+     * @return Appointment
+     */
+    Optional<AppointmentSlot> findOneByUuid(UUID uuid);
 
     /**
      * Find all appointments scheduled for a physician on a given date
@@ -32,4 +41,12 @@ public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Lo
      */
     @Query("select a from AppointmentSlot a join a.physician p where p.uuid = :physicianId and a.startDateTime < :date and a.endDateTime > :date")
     Collection<AppointmentSlot> findAllScheduledAppointments(UUID physicianId, LocalDateTime date);
+
+    /**
+     * Find all booked appointments for a patient
+     * @param patientId Patient UUID
+     * @return Collection of appointments
+     */
+    @Query("select a from AppointmentSlot a join a.patient p where p.uuid = :patientId")
+    Collection<AppointmentSlot> findBookedAppointments(UUID patientId);
 }

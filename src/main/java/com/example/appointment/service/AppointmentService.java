@@ -1,6 +1,6 @@
 package com.example.appointment.service;
 
-import com.example.appointment.dto.AppointmentDTO;
+import com.example.appointment.dto.AppointmentResponse;
 import com.example.appointment.web_service.AppointmentDetails;
 
 import java.time.LocalDate;
@@ -27,5 +27,22 @@ public interface AppointmentService {
      * @param date          Date
      * @return Collection of appointments
      */
-    Collection<AppointmentDTO> findAvailableAppointments(UUID physicianUuid, LocalDate date);
+    Collection<AppointmentResponse> getAvailableAppointmentSlots(UUID physicianUuid, LocalDate date);
+
+    /**
+     * Book an appointment slot for a patient
+     *
+     * @param appointmentUuid Appointment UUID
+     * @param patientUuid     Patient UUID
+     */
+    AppointmentResponse bookAppointmentSlot(UUID appointmentUuid, UUID patientUuid);
+
+
+    /**
+     * Find all booked appointments for a patient
+     *
+     * @param patientId Patient UUID
+     * @return Collection of appointments
+     */
+    Collection<AppointmentResponse> getBookedAppointmentSlots(UUID patientId);
 }

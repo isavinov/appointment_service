@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class CouldNotCreateAppointmentException extends RuntimeException{
+public class CouldNotCreateAppointmentSlotException extends RuntimeException{
 
-    public CouldNotCreateAppointmentException(String message) {
+    public CouldNotCreateAppointmentSlotException(String message) {
         super(message);
     }
 
-    public CouldNotCreateAppointmentException(String message, Throwable cause) {
+    public CouldNotCreateAppointmentSlotException(String message, Throwable cause) {
         super(message, cause);
     }
 }

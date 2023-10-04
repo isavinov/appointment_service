@@ -1,14 +1,17 @@
 package com.example.appointment.service;
 
 import com.example.appointment.domain.AppointmentSlot;
+import com.example.appointment.domain.Patient;
 import com.example.appointment.domain.Physician;
-import com.example.appointment.dto.AppointmentDTO;
-import com.example.appointment.exception.CouldNotCreateAppointmentException;
-import com.example.appointment.exception.PhysicianNotFoundException;
+import com.example.appointment.dto.AppointmentResponse;
+import com.example.appointment.exception.*;
 import com.example.appointment.repository.AppointmentRepository;
+import com.example.appointment.repository.PatientRepository;
 import com.example.appointment.repository.PhysicianRepository;
 import com.example.appointment.web_service.AppointmentDetails;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -29,10 +32,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
 
-    public AppointmentServiceImpl(PhysicianRepository physicianRepository,
-            AppointmentRepository appointmentRepository) {
+    private final PatientRepository patientRepository;
+
+    public AppointmentServiceImpl(PhysicianRepository physicianRepository, AppointmentRepository appointmentRepository,
+            PatientRepository patientRepository) {
         this.physicianRepository = physicianRepository;
         this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
@@ -49,7 +55,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                     || !appointmentRepository.findAllScheduledAppointments(physicianUuid,
                             toLocalDateTime(appointment.getStartDateTime()).plusMinutes(appointment.getDuration().getMinutes()))
                     .isEmpty()) {
-                throw new CouldNotCreateAppointmentException(
+                throw new CouldNotCreateAppointmentSlotException(
                         "Could not create an appointment due to appointment conflict");
             }
             result.add(createAppointment(physician, appointment));
@@ -59,10 +65,39 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public Collection<AppointmentDTO> findAvailableAppointments(UUID physicianUuid, LocalDate date) {
+    public Collection<AppointmentResponse> getAvailableAppointmentSlots(UUID physicianUuid, LocalDate date) {
         return appointmentRepository.getAvailableAppointments(physicianUuid, date)
                 .stream()
-                .map(AppointmentDTO::fromEntity)
+                .map(AppointmentResponse::fromEntity)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    public AppointmentResponse bookAppointmentSlot(UUID appointmentUuid, UUID patientUuid) {
+        AppointmentSlot appointment = appointmentRepository.findOneByUuid(appointmentUuid)
+                .orElseThrow(() -> new AppointmentSlotNotFoundException(
+                        String.format("Appointment %s not found", appointmentUuid)));
+
+        if (appointment.getPatient() != null) {
+            throw new AppointmentSlotAlreadyBookedException(
+                    String.format("Appointment %s is already booked", appointmentUuid));
+        }
+
+        Patient patient = patientRepository.findOneByUuid(patientUuid)
+                .orElseThrow(() -> new PatientNotFoundException(String.format("Patient %s not found", patientUuid)));
+        appointment.setPatient(patient);
+        appointmentRepository.save(appointment);
+        return AppointmentResponse.fromEntity(appointment);
+    }
+
+    @Override
+    @Transactional
+    public Collection<AppointmentResponse> getBookedAppointmentSlots(UUID patientId) {
+        return appointmentRepository.findBookedAppointments(patientId)
+                .stream()
+                .map(AppointmentResponse::fromEntity)
                 .toList();
     }
 

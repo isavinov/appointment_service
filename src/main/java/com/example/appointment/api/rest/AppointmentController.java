@@ -1,6 +1,6 @@
 package com.example.appointment.api.rest;
 
-import com.example.appointment.dto.AppointmentDTO;
+import com.example.appointment.dto.AppointmentResponse;
 import com.example.appointment.service.AppointmentService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +22,9 @@ public class AppointmentController {
     }
 
     @GetMapping(params = { "physician", "date" })
-    public Collection<AppointmentDTO> getAvailableSlots(@RequestParam("physician") UUID physicianUuid,
+    public Collection<AppointmentResponse> getAvailableSlots(@RequestParam("physician") UUID physicianUuid,
             @RequestParam LocalDate date) {
-        return appointmentService.findAvailableAppointments(physicianUuid, date);
+        return appointmentService.getAvailableAppointmentSlots(physicianUuid, date);
     }
 
 }
