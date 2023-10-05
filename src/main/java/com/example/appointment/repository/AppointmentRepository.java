@@ -1,7 +1,9 @@
 package com.example.appointment.repository;
 
 import com.example.appointment.domain.AppointmentSlot;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,13 +25,13 @@ public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Lo
     Optional<AppointmentSlot> findOneByUuid(UUID uuid);
 
     /**
-     * Find all appointments scheduled for a physician on a given date
+     * Find available appointments scheduled by a physician on a given date
      *
      * @param physicianId Physician UUID
      * @param date        Date
      * @return Collection of appointments
      */
-    @Query("select a from AppointmentSlot a where a.physician.uuid = :physicianId and cast(a.startDateTime as localdate) = :date and a.patient is null")
+    @Query("select a from AppointmentSlot a join fetch a.physician p where p.uuid = :physicianId and cast(a.startDateTime as localdate) = :date and a.patient is null")
     Collection<AppointmentSlot> getAvailableAppointments(UUID physicianId, LocalDate date);
 
     /**
@@ -39,7 +41,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Lo
      * @param date        Date and Time
      * @return Collection of appointments
      */
-    @Query("select a from AppointmentSlot a join a.physician p where p.uuid = :physicianId and a.startDateTime < :date and a.endDateTime > :date")
+    @Query("select a from AppointmentSlot a join fetch a.physician p where p.uuid = :physicianId and a.startDateTime < :date and a.endDateTime > :date")
     Collection<AppointmentSlot> findAllScheduledAppointments(UUID physicianId, LocalDateTime date);
 
     /**
@@ -47,6 +49,16 @@ public interface AppointmentRepository extends JpaRepository<AppointmentSlot, Lo
      * @param patientId Patient UUID
      * @return Collection of appointments
      */
-    @Query("select a from AppointmentSlot a join a.patient p where p.uuid = :patientId")
+    @Query("select a from AppointmentSlot a join fetch a.patient p join fetch a.physician where p.uuid = :patientId")
     Collection<AppointmentSlot> findBookedAppointments(UUID patientId);
+
+
+    /**
+     * Find an appointment by UUID and lock it for update
+     *
+     * @param uuid Appointment UUID
+     * @return Appointment
+     */
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    Optional<AppointmentSlot> findAndLockByUuid(UUID uuid);
 }

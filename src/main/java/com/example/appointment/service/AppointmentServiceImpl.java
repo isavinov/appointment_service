@@ -50,6 +50,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                         () -> new PhysicianNotFoundException(String.format("Physician %s not found", physicianUuid)));
 
         for (AppointmentDetails appointment : appointments) {
+            //TODO: Check if there are conflicts with already scheduled appointments. How to optimise this?
             if (!appointmentRepository.findAllScheduledAppointments(physicianUuid,
                     toLocalDateTime(appointment.getStartDateTime())).isEmpty()
                     || !appointmentRepository.findAllScheduledAppointments(physicianUuid,
@@ -74,9 +75,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     public AppointmentResponse bookAppointmentSlot(UUID appointmentUuid, UUID patientUuid) {
-        AppointmentSlot appointment = appointmentRepository.findOneByUuid(appointmentUuid)
+        AppointmentSlot appointment = appointmentRepository.findAndLockByUuid(appointmentUuid)
                 .orElseThrow(() -> new AppointmentSlotNotFoundException(
                         String.format("Appointment %s not found", appointmentUuid)));
 
